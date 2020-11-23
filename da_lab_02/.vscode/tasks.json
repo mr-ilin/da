@@ -1,0 +1,42 @@
+{
+    "tasks": [
+        {
+            "label": "Build C/C++ with Makefile",
+            "type": "shell",
+            "command": "make",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always"
+            },
+            "detail": "Generated task by Me"
+        },
+        {
+            "label": "Build C/C++ for Debug with Makefile",
+            "type": "shell",
+            "command": "make debug",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "detail": "Generated task by Me"
+        },
+        {
+            "label": "Run make clean on folder",
+            "type": "shell",
+            "command": "make clean",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "detail": "Generated task by Me"
+        }
+    ],
+    "version": "2.0.0"
+}

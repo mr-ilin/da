@@ -1,0 +1,7 @@
++ c 3
++ n 14
++ o 15
++ I 9
++ b 2
++ f 6
+! Save output.txt
