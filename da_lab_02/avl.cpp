@@ -307,7 +307,7 @@ void TAvlTree::DfsPrint(const TAvlNode* node, const int& depth) const {
     for (int i = 0; i < depth; i++) {
         std::cout << "---";
     }
-    std::cout << "[\"" << node->key << "\", " << node->value << ", " << GetBalance(node) <<"b]\n";
+    std::cout << "[\"" << node->key << "\", " << node->value << ", " << node->height <<"h]\n";
 
     DfsPrint(node->left, depth + 1);
 }

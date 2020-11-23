@@ -102,6 +102,19 @@ const char& TString::operator[](size_t idx) const {
     return buffer[idx];
 }
 
+// Оператор присваивания
+TString& TString::operator=(TString const& another)
+{
+    char* tmp = new char[another.capacity];
+    std::copy(another.buffer, another.buffer + another.capacity, tmp);
+    delete [] buffer;
+    buffer = tmp;
+    tmp = nullptr;
+    size = another.size;
+    capacity= another.capacity;
+    return *this;
+}
+
 std::ostream& operator<<(std::ostream& os, const TString& lhs) {
     if (lhs.buffer) {
         os << lhs.buffer;
@@ -109,12 +122,10 @@ std::ostream& operator<<(std::ostream& os, const TString& lhs) {
     return os;
 }
 std::istream& operator>>(std::istream& is, TString& lhs) {
-    if (lhs.buffer) {
-        delete[] lhs.buffer;
+    if (!lhs.buffer) {
+        lhs.buffer = new char[256]{'\0'};
+        lhs.capacity = 256;
     }
-
-    lhs.buffer = new char[256];
-    lhs.capacity = 256;
 
     is >> lhs.buffer;
     size_t size = 0;

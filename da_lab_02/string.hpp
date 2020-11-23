@@ -30,6 +30,7 @@ public:
 
     char& operator[](size_t idx);
     const char& operator[](size_t idx) const;
+    TString& operator=(TString const& another);
 
     friend std::ostream& operator<<(std::ostream& os, const TString& lhs);
 	friend std::istream& operator>>(std::istream& is, TString& lhs);
