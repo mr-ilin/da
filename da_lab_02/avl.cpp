@@ -19,6 +19,14 @@ TAvlNode::TAvlNode(const TString& k, const uint64_t& val)
     right(nullptr)
 {}
 
+TAvlNode::TAvlNode(const TString& k, const uint64_t& val, const int& h)
+    : key(k),
+    value(val),
+    height(h),
+    left(nullptr),
+    right(nullptr)
+{}
+
 TAvlNode::TAvlNode(TString&& k, uint64_t&& val) noexcept
     : key(std::move(k)),
     value(std::move(val)),
@@ -221,7 +229,7 @@ void TAvlTree::Remove(const TString& key, const bool& printResult) {
 
 // Рекурсивное удаление дерева
 void TAvlTree::SubDeleteTree(TAvlNode* node) {
-    if(node) {
+    if (node) {
         SubDeleteTree(node->left);
         SubDeleteTree(node->right);
         delete node;
@@ -235,15 +243,17 @@ void TAvlTree::DeleteTree() {
 
 // Рекурсивная функция сохранения
 void TAvlTree::SubSave(std::ostream& os, const TAvlNode* node) {
+    // key.size key value height left right
     if (!node) {
         return;
     }
 
-    size_t bufferSize = node->key.Size();
-    os.write((char*)(&bufferSize), sizeof(bufferSize));
-    os.write(node->key.Buffer(), bufferSize);
+    size_t keySize = node->key.Size();
+    os.write((char*)(&keySize), sizeof(keySize));
+    os.write(node->key.Buffer(), keySize);
     os.write((char*)(&node->value), sizeof(node->value));
-
+    os.write((char*)(&node->height), sizeof(node->height));
+    
     bool LSon = (node->left != nullptr);
     bool RSon = (node->right != nullptr);
     os.write((char*)(&LSon), sizeof(LSon));
@@ -267,11 +277,13 @@ TAvlNode* TAvlTree::SubLoad(std::istream& is) {
     }
 
     char* key = new char[keySize + 1]{'\0'};
-    //key[keySize] = '\0';
     is.read(key, keySize);
 
     uint64_t value = 0;
     is.read((char*)(&value), sizeof(value));
+    
+    int height = 1;
+    is.read((char*)(&height), sizeof(height));
 
     bool LSon = false;
     bool RSon = false;
@@ -279,7 +291,8 @@ TAvlNode* TAvlTree::SubLoad(std::istream& is) {
     is.read((char*)(&LSon), sizeof(LSon));
     is.read((char*)(&RSon), sizeof(RSon));
 
-    TAvlNode* node = new TAvlNode(key, value);
+    TAvlNode* node = new TAvlNode(key, value, height);
+    delete[] key;
 
     if (LSon) {
         node->left = SubLoad(is);
@@ -334,6 +347,7 @@ void TAvlTree::DfsPrint(const TAvlNode* node, const int& depth) const {
         std::cout << "---";
     }
     std::cout << "[\"" << node->key << "\", " << node->value << ", " << GetBalance(node) <<" b]\n";
+    // << node->height <<"h]\n";
     //std::cout << "[ " << GetBalance(node) <<" b]\n";
 
     DfsPrint(node->left, depth + 1);

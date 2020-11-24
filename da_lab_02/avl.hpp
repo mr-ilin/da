@@ -12,6 +12,7 @@ struct TAvlNode {
 
     TAvlNode();
     TAvlNode(const TString& k, const uint64_t& val);
+    TAvlNode(const TString& k, const uint64_t& val, const int& h);
     TAvlNode(TString&& k, uint64_t&& val) noexcept;
     ~TAvlNode();
 };

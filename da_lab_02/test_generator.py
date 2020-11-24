@@ -45,12 +45,12 @@ def main():
                 foutput.write("+ {} {}\n".format(key, value))
 
             # Поиск
-            random.shuffle(values)
+            # random.shuffle(values)
             for value in values:
                 foutput.write("{}\n".format(value[0]))
             
             # Удаление
-            random.shuffle(values)
+            # random.shuffle(values)
             for value in values:
                 foutput.write("- {}\n".format(value[0]))
 
