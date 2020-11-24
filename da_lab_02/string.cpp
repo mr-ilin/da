@@ -28,10 +28,14 @@ TString::TString(const TString& str) {
 }
 
 TString::TString(TString&& str) noexcept:
-    buffer(std::move(str.buffer)),
-    size(std::move(str.size)),
-    capacity(std::move(str.capacity))
-{}
+    buffer(str.buffer),
+    size(str.size),
+    capacity(str.capacity)
+{
+    str.buffer = nullptr;
+    str.size = 0;
+    str.capacity = 0;
+}
 
 // Деструктор
 TString::~TString() {
@@ -103,24 +107,32 @@ const char& TString::operator[](size_t idx) const {
 }
 
 // Оператор присваивания
-TString& TString::operator=(const TString& another)
+TString& TString::operator=(const TString& rhs)
 {
     if (this->buffer) {
         delete[] buffer;
     }
-    this->buffer = new char[another.capacity]{'\0'};
-    std::copy(another.buffer, another.buffer + another.capacity, this->buffer);
-    this->capacity = another.capacity;
-    this->size = another.size;
+    this->buffer = new char[rhs.capacity]{'\0'};
+    std::copy(rhs.buffer, rhs.buffer + rhs.capacity, this->buffer);
+    this->capacity = rhs.capacity;
+    this->size = rhs.size;
     return *this;
-//    char* tmp = new char[another.capacity]{'\0'};
-//    std::copy(another.buffer, another.buffer + another.capacity, tmp);
-//    delete [] buffer;
-//    buffer = tmp;
-//    tmp = nullptr;
-//    size = another.size;
-//    capacity= another.capacity;
-//    return *this;
+}
+
+TString& TString::operator=(TString&& rhs) noexcept {
+    if (this == &rhs) {
+        return *this;
+    }
+    
+    delete[] buffer;
+    buffer = rhs.buffer;
+    size = rhs.size;
+    capacity = rhs.capacity;
+    
+    rhs.buffer = nullptr;
+    rhs.size = 0;
+    rhs.capacity = 0;
+    return *this;
 }
 
 std::ostream& operator<<(std::ostream& os, const TString& lhs) {
