@@ -10,21 +10,21 @@ TString::TString() :
 TString::TString(const char* str) {
     size = std::strlen(str);
     capacity = size + 1;
-    buffer = new char[capacity];
+    buffer = new char[capacity]{'\0'};
     for (size_t i = 0; i < size; ++i) {
         buffer[i] = str[i];
     }
-    buffer[size] = '\0';
+    //buffer[size] = '\0';
 }
 
 TString::TString(const TString& str) {
     size = str.size;
     capacity = str.capacity;
-    buffer = new char[capacity];
+    buffer = new char[capacity]{'\0'};
     for (size_t i = 0; i < size; ++i) {
         buffer[i] = str[i];
     }
-    buffer[size] = '\0';
+    //buffer[size] = '\0';
 }
 
 TString::TString(TString&& str) noexcept:
@@ -103,16 +103,24 @@ const char& TString::operator[](size_t idx) const {
 }
 
 // Оператор присваивания
-TString& TString::operator=(TString const& another)
+TString& TString::operator=(const TString& another)
 {
-    char* tmp = new char[another.capacity];
-    std::copy(another.buffer, another.buffer + another.capacity, tmp);
-    delete [] buffer;
-    buffer = tmp;
-    tmp = nullptr;
-    size = another.size;
-    capacity= another.capacity;
+    if (this->buffer) {
+        delete[] buffer;
+    }
+    this->buffer = new char[another.capacity]{'\0'};
+    std::copy(another.buffer, another.buffer + another.capacity, this->buffer);
+    this->capacity = another.capacity;
+    this->size = another.size;
     return *this;
+//    char* tmp = new char[another.capacity]{'\0'};
+//    std::copy(another.buffer, another.buffer + another.capacity, tmp);
+//    delete [] buffer;
+//    buffer = tmp;
+//    tmp = nullptr;
+//    size = another.size;
+//    capacity= another.capacity;
+//    return *this;
 }
 
 std::ostream& operator<<(std::ostream& os, const TString& lhs) {
@@ -123,8 +131,8 @@ std::ostream& operator<<(std::ostream& os, const TString& lhs) {
 }
 std::istream& operator>>(std::istream& is, TString& lhs) {
     if (!lhs.buffer) {
-        lhs.buffer = new char[256]{'\0'};
-        lhs.capacity = 256;
+        lhs.buffer = new char[257]{'\0'};
+        lhs.capacity = 257;
     }
 
     is >> lhs.buffer;

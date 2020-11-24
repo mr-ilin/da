@@ -6,7 +6,7 @@ OBJ=$(SRC:.cpp=.o)
 
 all: $(EXECUTABLE)
 
-debug: CXXFLAGS += -g -fsanitize=address
+debug: CXXFLAGS += -g
 debug: all
 
 $(EXECUTABLE): $(OBJ)
