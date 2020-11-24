@@ -205,18 +205,18 @@ TAvlNode* TAvlTree::SubRemove(TAvlNode* node, const TString& key, const bool& pr
             }
             delete node;
             return lSon;
-        } else if (!lSon) {
+        } 
+        if (!lSon) {
             if (printResult) {
                 std::cout << "OK\n";
             }
             delete node;
             return rSon;
-        } else {
-            // Есть оба сына
-            node->right = RemoveMin(node, rSon);
-            if (printResult) {
-                std::cout << "OK\n";
-            }
+        } 
+        // Есть оба сына
+        node->right = RemoveMin(node, rSon);
+        if (printResult) {
+            std::cout << "OK\n";
         }
     }
     return Balance(node);
