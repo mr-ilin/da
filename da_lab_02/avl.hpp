@@ -11,9 +11,7 @@ struct TAvlNode {
     TAvlNode* right;
 
     TAvlNode();
-    TAvlNode(const TString& k, const uint64_t& val);
-    TAvlNode(const TString& k, const uint64_t& val, const int& h);
-    TAvlNode(TString&& k, uint64_t&& val) noexcept;
+    TAvlNode(TString k, uint64_t val, int h = 1);
     ~TAvlNode();
 };
 
@@ -29,7 +27,7 @@ private:
     TAvlNode* Balance(TAvlNode* node);
     void RecountHeight(TAvlNode* node);
 
-    TAvlNode* InsertInNode(TAvlNode* node, const TString& key, const uint64_t& value, const bool& printResult);
+    TAvlNode* InsertInNode(TAvlNode* node, TString key, uint64_t value, const bool& printResult);
     TAvlNode* RemoveMin(TAvlNode* node, TAvlNode* curr);
     TAvlNode* SubRemove(TAvlNode* node, const TString& key, const bool& printResult);
     void SubDeleteTree(TAvlNode* node);
@@ -42,7 +40,7 @@ public:
     ~TAvlTree();
     
     TAvlNode* Find(const TString& key) const;
-    void Insert(const TString& key, const u_int64_t& value, const bool& printResult);
+    void Insert(TString key, u_int64_t value, const bool& printResult);
     void Remove(const TString& key, const bool& printResult);
     void DeleteTree();
     void Save(const TString& path, const bool& printResult);

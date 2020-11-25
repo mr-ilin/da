@@ -13,6 +13,7 @@ public:
     TString();
     TString(const char* str);
     TString(const TString& str);
+    TString(char* & str, size_t s, size_t cap);
     TString(TString&& str) noexcept;
     ~TString();
 
@@ -21,7 +22,6 @@ public:
     const char* begin() const;
     const char* end() const;
 
-    void Move(char* str) noexcept;
     void Swap(TString& str);
     size_t Size() const;
     const char* Buffer() const;

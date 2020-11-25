@@ -46,13 +46,13 @@ def main():
 
             # Поиск
             # random.shuffle(values)
-            for value in values:
-                foutput.write("{}\n".format(value[0]))
+            # for value in values:
+            #     foutput.write("{}\n".format(value[0]))
             
             # Удаление
             # random.shuffle(values)
-            for value in values:
-                foutput.write("- {}\n".format(value[0]))
+            # for value in values:
+            #     foutput.write("- {}\n".format(value[0]))
 
 if __name__ == "__main__":
     main()

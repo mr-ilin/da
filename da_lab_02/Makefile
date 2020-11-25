@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-std=c++17 -pedantic -Wall
+CXXFLAGS=-std=c++17 -pedantic -Wall -O2
 EXECUTABLE=solution
 SRC=main.cpp avl.cpp string.cpp
 OBJ=$(SRC:.cpp=.o)

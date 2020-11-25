@@ -1,8 +1,8 @@
 #include "string.hpp"
 
 // Конструкторы
-TString::TString() : 
-    buffer(nullptr),
+TString::TString()
+    : buffer(nullptr),
     size(0),
     capacity(0)
 {}
@@ -14,7 +14,6 @@ TString::TString(const char* str) {
     for (size_t i = 0; i < size; ++i) {
         buffer[i] = str[i];
     }
-    //buffer[size] = '\0';
 }
 
 TString::TString(const TString& str) {
@@ -24,17 +23,24 @@ TString::TString(const TString& str) {
     for (size_t i = 0; i < size; ++i) {
         buffer[i] = str[i];
     }
-    //buffer[size] = '\0';
 }
 
-TString::TString(TString&& str) noexcept:
-    buffer(str.buffer),
+TString::TString(TString&& str) noexcept
+    : buffer(str.buffer),
     size(str.size),
     capacity(str.capacity)
 {
     str.buffer = nullptr;
     str.size = 0;
     str.capacity = 0;
+}
+
+TString::TString(char* & str, size_t s, size_t cap)
+    : buffer(str),
+    size(s),
+    capacity(cap)
+{
+    str = nullptr;
 }
 
 // Деструктор
@@ -64,15 +70,6 @@ const char* TString::end() const{
         return buffer + size;
     }
     return nullptr;
-}
-
-// Перемещение
-void TString::Move(char* str) noexcept {
-    delete[] buffer;
-    buffer = str;
-    size = std::strlen(str);
-    capacity = size + 1;
-    str = nullptr;
 }
 
 // Обмен
@@ -107,8 +104,7 @@ const char& TString::operator[](size_t idx) const {
 }
 
 // Оператор присваивания
-TString& TString::operator=(const TString& rhs)
-{
+TString& TString::operator=(const TString& rhs) {
     if (this->buffer) {
         delete[] buffer;
     }
