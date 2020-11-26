@@ -146,9 +146,9 @@ void TAvlTree::Insert(TString key, u_int64_t value, const bool& printResult) {
     root = InsertInNode(root, std::move(key), std::move(value), printResult);
 }
 
-// Удаляет мин. вершину из правого поддерева curr дерева root
+// Удаляет мин. вершину из правого поддерева curr дерева node
 // И меняет вершину root на мин. вершину
-// Возвращает правое поддерево root'а
+// Возвращает правое поддерево node'а
 TAvlNode* TAvlTree::RemoveMin(TAvlNode* node, TAvlNode* curr) {
     if (curr->left) {
         curr->left = RemoveMin(node, curr->left);

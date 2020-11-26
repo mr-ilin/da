@@ -11,7 +11,7 @@ int main() {
     std::ios_base::sync_with_stdio(false);
     std::cin.tie(nullptr);
     
-    /*std::chrono::time_point<std::chrono::system_clock> start, end;
+    std::chrono::time_point<std::chrono::system_clock> start, end;
     uint64_t avlTime = 0;
     uint64_t mapTime = 0;
 
@@ -79,8 +79,8 @@ int main() {
     std::cout << "-----------------------------" << std::endl;
     
     
-    */
     
+    /*
     std::chrono::time_point<std::chrono::system_clock> start, end;
     int64_t avlInsertTime = 0;
     int64_t mapInsertTime = 0;
@@ -183,5 +183,6 @@ int main() {
     std::cout << "Load avl tree time = " << avlLoadTime << "ms" << std::endl;
     std::cout << "-----------------------------" << std::endl;
     
+    */
     return 0;
 }

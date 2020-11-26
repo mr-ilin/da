@@ -38,7 +38,7 @@ private:
 public:
     TAvlTree();
     ~TAvlTree();
-    
+
     TAvlNode* Find(const TString& key) const;
     void Insert(TString key, u_int64_t value, const bool& printResult);
     void Remove(const TString& key, const bool& printResult);
