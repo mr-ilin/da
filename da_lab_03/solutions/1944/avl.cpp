@@ -11,20 +11,21 @@ TAvlNode::TAvlNode()
     right(nullptr)
 {}
 
-TAvlNode::TAvlNode(TString k, uint64_t val, int h)
-    : key(std::move(k)),
+TAvlNode::TAvlNode(const TString& k, const u_int64_t& val)
+    : key(k), 
     value(val),
-    height(h),
+    height(1),
     left(nullptr),
     right(nullptr)
 {}
 
-TAvlNode::~TAvlNode() {
-    value = 0;
-    height = 0;
-    left = nullptr;
-    right = nullptr;
-}
+TAvlNode::TAvlNode(TString&& k, u_int64_t&& val) noexcept
+    : key(std::move(k)),
+    value(std::move(val)),
+    height(1),
+    left(nullptr),
+    right(nullptr)
+{}
 
 TAvlTree::TAvlTree()
     : root()
@@ -120,30 +121,26 @@ TAvlNode* TAvlTree::Find(const TString& key) const {
 
 // Рекурсивная вставка узла в дерево
 // Возвращает корень дерева
-TAvlNode* TAvlTree::InsertInNode(TAvlNode* node, TString key, uint64_t value, const bool& printResult) {
+TAvlNode* TAvlTree::InsertInNode(TAvlNode* node, const TString& key, const uint64_t& value) {
     if (!node) {
-        if (printResult) {
-            std::cout << "OK\n";
-        }
-        return new TAvlNode(std::move(key), std::move(value));
+        std::cout << "OK\n";
+        return new TAvlNode(key, value);
     }
 
     if (key < node->key) {
-        node->left = InsertInNode(node->left, std::move(key), std::move(value), printResult);
+        node->left = InsertInNode(node->left, key, value);
     } else if (key > node->key) {
-        node->right = InsertInNode(node->right, std::move(key), std::move(value), printResult);
+        node->right = InsertInNode(node->right, key, value);
     } else {
-        if (printResult) {
-            std::cout << "Exist\n";
-        }
+        std::cout << "Exist\n";
     }
 
     return Balance(node);
 }
 
 // Обертка над вставкой
-void TAvlTree::Insert(TString key, u_int64_t value, const bool& printResult) {
-    root = InsertInNode(root, std::move(key), std::move(value), printResult);
+void TAvlTree::Insert(const TString& key, const u_int64_t& value) {
+    root = InsertInNode(root, key, value);
 }
 
 // Удаляет мин. вершину из правого поддерева curr дерева root
@@ -155,9 +152,7 @@ TAvlNode* TAvlTree::RemoveMin(TAvlNode* node, TAvlNode* curr) {
     } else {
         TAvlNode* r = curr->right;
         node->key.Swap(curr->key); // Потом все равно удалится
-        node->value = std::move(curr->value);
-        //node->key = curr->key;
-        //node->value = curr->value;
+        node->value = curr->value;
 
         delete curr;
         curr = r;
@@ -167,40 +162,32 @@ TAvlNode* TAvlTree::RemoveMin(TAvlNode* node, TAvlNode* curr) {
 
 // Удаляет вершину с ключом key из дерева node
 // Возвращает измененное дерево
-TAvlNode* TAvlTree::SubRemove(TAvlNode* node, const TString& key, const bool& printResult) {
+TAvlNode* TAvlTree::SubRemove(TAvlNode* node, const TString& key) {
     if (!node) {
-        if (printResult) {
-            std::cout << "NoSuchWord\n";
-        }
+        std::cout << "NoSuchWord\n";
         return nullptr;
     }
 
     if (key < node->key) {
-        node->left = SubRemove(node->left, key, printResult);
+        node->left = SubRemove(node->left, key);
     } else if (key > node->key) {
-        node->right = SubRemove(node->right, key, printResult);
+        node->right = SubRemove(node->right, key);
     } else { 
         // Нашли вершину для удаления
         TAvlNode* rSon = node->right;
         TAvlNode* lSon = node->left;
 
         if (!rSon) {
-            if (printResult) {
-                std::cout << "OK\n";
-            }
+            std::cout << "OK\n";
             delete node;
             return lSon;
-        } 
-        if (!lSon) {
-            if (printResult) {
-                std::cout << "OK\n";
-            }
+        } else if (!lSon) {
+            std::cout << "OK\n";
             delete node;
             return rSon;
-        } 
-        // Есть оба сына
-        node->right = RemoveMin(node, rSon);
-        if (printResult) {
+        } else {
+            // Есть оба сына
+            node->right = RemoveMin(node, rSon);
             std::cout << "OK\n";
         }
     }
@@ -208,13 +195,13 @@ TAvlNode* TAvlTree::SubRemove(TAvlNode* node, const TString& key, const bool& pr
 }
 
 // Обертка над Remove
-void TAvlTree::Remove(const TString& key, const bool& printResult) {
-    root = SubRemove(root, key, printResult);
+void TAvlTree::Remove(const TString& key) {
+    root = SubRemove(root, key);
 }
 
 // Рекурсивное удаление дерева
 void TAvlTree::SubDeleteTree(TAvlNode* node) {
-    if (node) {
+    if(node) {
         SubDeleteTree(node->left);
         SubDeleteTree(node->right);
         delete node;
@@ -228,17 +215,15 @@ void TAvlTree::DeleteTree() {
 
 // Рекурсивная функция сохранения
 void TAvlTree::SubSave(std::ostream& os, const TAvlNode* node) {
-    // key.size key value height left right
     if (!node) {
         return;
     }
 
-    size_t keySize = node->key.Size();
-    os.write((char*)(&keySize), sizeof(keySize));
-    os.write(node->key.Buffer(), keySize);
+    size_t bufferSize = node->key.Size();
+    os.write((char*)(&bufferSize), sizeof(bufferSize));
+    os.write(node->key.Buffer(), bufferSize);
     os.write((char*)(&node->value), sizeof(node->value));
-    os.write((char*)(&node->height), sizeof(node->height));
-    
+
     bool LSon = (node->left != nullptr);
     bool RSon = (node->right != nullptr);
     os.write((char*)(&LSon), sizeof(LSon));
@@ -261,15 +246,12 @@ TAvlNode* TAvlTree::SubLoad(std::istream& is) {
         return nullptr;
     }
 
-    char* str = new char[keySize + 1]{'\0'};
-    is.read(str, keySize);
-    TString key(str, keySize, keySize + 1);
+    char* key = new char[keySize + 1];
+    key[keySize] = '\0';
+    is.read(key, keySize);
 
     uint64_t value = 0;
     is.read((char*)(&value), sizeof(value));
-    
-    int height = 1;
-    is.read((char*)(&height), sizeof(height));
 
     bool LSon = false;
     bool RSon = false;
@@ -277,19 +259,24 @@ TAvlNode* TAvlTree::SubLoad(std::istream& is) {
     is.read((char*)(&LSon), sizeof(LSon));
     is.read((char*)(&RSon), sizeof(RSon));
 
-    TAvlNode* node = new TAvlNode(std::move(key), std::move(value), std::move(height));
+    TAvlNode* node = new TAvlNode(key, value);
 
     if (LSon) {
         node->left = SubLoad(is);
+    } else {
+        node->left = nullptr;
     }
+
     if (RSon) {
         node->right = SubLoad(is);
+    } else {
+        node->right = nullptr;
     }
 
     return node;
 }
 
-void TAvlTree::Save(const TString& path, const bool& printResult) {
+void TAvlTree::Save(const TString& path) {
     std::ofstream os(path.Buffer(), std::ios::binary | std::ios::out);
     if (!os) {
         throw std::runtime_error("Can't open file");
@@ -297,22 +284,19 @@ void TAvlTree::Save(const TString& path, const bool& printResult) {
 
     SubSave(os, root);
     os.close();
-    if (printResult) {
-        std::cout << "OK\n";
-    }
+    std::cout << "OK\n";
 }
 
-void TAvlTree::Load(const TString& path, const bool& printResult) {
+void TAvlTree::Load(const TString& path) {
     std::ifstream is(path.Buffer(), std::ios::binary | std::ios::in);
     if (!is) {
         throw std::runtime_error("Can't open file");
     }
+
     DeleteTree();
     root = SubLoad(is);
     is.close();
-    if (printResult) {
-        std::cout << "OK\n";
-    }
+    std::cout << "OK\n";
 }
 
 void TAvlTree::DfsPrint(const TAvlNode* node, const int& depth) const {
@@ -325,13 +309,11 @@ void TAvlTree::DfsPrint(const TAvlNode* node, const int& depth) const {
     for (int i = 0; i < depth; i++) {
         std::cout << "---";
     }
-    std::cout << "[\"" << node->key << "\", " << node->value << ", " << GetBalance(node) <<" b]\n";
-    // << node->height <<"h]\n";
-    //std::cout << "[ " << GetBalance(node) <<" b]\n";
+    std::cout << "[\"" << node->key << "\", " << node->value << ", " << GetBalance(node) <<"b]\n";
 
     DfsPrint(node->left, depth + 1);
 }
 
-void TAvlTree::Print() const {
+void TAvlTree::Print() const{
     DfsPrint(root, 0);
 }

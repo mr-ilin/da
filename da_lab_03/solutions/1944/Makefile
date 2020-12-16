@@ -1,28 +1,28 @@
 CXX=g++
-CXXFLAGS=-std=c++17 -pedantic -Wall -O2
+CXXFLAGS=-std=c++17 -pedantic -Wall -g -no-pie
 EXECUTABLE=solution
 SRC=main.cpp avl.cpp string.cpp
 OBJ=$(SRC:.cpp=.o)
 
 all: $(EXECUTABLE)
 
-debug: CXXFLAGS += -g -fsanitize=address
-debug: all
-
 $(EXECUTABLE): $(OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJ) -o $@
-
-benchmark: benchmark.o string.o avl.o
-	$(CXX) $(CXXFLAGS) $^ -o $@
 
 .cpp.o:
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-avl.cpp: avl.hpp string.hpp
+# benchmark: benchmark.o sort.o date.o
+# 	$(CC) $(FLAGS) sort.o date.o benchmark.o -o $@
+
+# benchmark.o: benchmark.cpp vector.hpp
+# 	$(CC) $(CFLAGS) -c $< -o $@
+
+avl.cpp: avl.hpp
 
 string.cpp : string.hpp
 
 main.o : string.hpp avl.hpp
 
 clean:
-	rm -f *.o $(EXECUTABLE) benchmark
+	rm -f *.o $(EXECUTABLE)

@@ -1,4 +1,3 @@
-
 ### C++ ###
 # Prerequisites
 *.d
@@ -44,7 +43,9 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
-./build/*
+Extra/
+extra
+build/*
 .cmake
 
 ### CMake Patch ###
@@ -86,8 +87,13 @@ Temporary Items
 # Ignore all local history of files
 .history
 
-### Me ###
-Extra
-extra
-*.t
+# End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,macos,c++,cmake
 
+# Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
+
+*.xcuserstate
+*.xcuserstate
+*.pbxproj
+*.xcworkspacedata
+*.plist
+*.xcbkptlist

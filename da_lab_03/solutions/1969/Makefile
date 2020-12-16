@@ -1,11 +1,13 @@
 CXX=g++
-CXXFLAGS=-std=c++17 -pedantic -Wall -O2
+CXXFLAGS=-std=c++17 -pedantic -Wall
 EXECUTABLE=solution
 SRC=main.cpp avl.cpp string.cpp
 OBJ=$(SRC:.cpp=.o)
 
-debug: CXXFLAGS += -g -no-pie #-fsanitize=address
-debug: $(EXECUTABLE)
+all: $(EXECUTABLE)
+
+debug: CXXFLAGS += -g -no-pie
+debug: all
 
 $(EXECUTABLE): $(OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJ) -o $@

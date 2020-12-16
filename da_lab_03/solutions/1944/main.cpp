@@ -13,7 +13,6 @@ int main() {
     uint64_t value;
     TString cmd2;
     TString path;
-    const bool printResult = true;
 
     while (std::cin >> cmd) {
         try {
@@ -21,19 +20,19 @@ int main() {
                 // Добавление
                 std::cin >> key >> value;
                 key.ToUpperCase();
-                tree.Insert(std::move(key), std::move(value), printResult);
+                tree.Insert(key, value);
             } else if (cmd == "-") {
                 // Удаление
                 std::cin >> key;
                 key.ToUpperCase();
-                tree.Remove(key, printResult);
+                tree.Remove(key);
             } else if (cmd == "!") {
                 // Сохранение, загрузка
                 std::cin >> cmd2 >> path;
                 if (cmd2 == "Save") {
-                    tree.Save(path, printResult);
+                    tree.Save(path);
                 } else {
-                    tree.Load(path, printResult);
+                    tree.Load(path);
                 }
             } else if (cmd == "*") {
                 // Печать дерева
@@ -42,7 +41,7 @@ int main() {
                 // Поиск
                 cmd.ToUpperCase(); // word
                 TAvlNode* result = tree.Find(cmd);
-                if (!result && printResult) {
+                if (!result) {
                     std::cout << "NoSuchWord\n";
                 } else {
                     std::cout << "OK: " << result->value << "\n";
@@ -53,6 +52,6 @@ int main() {
             std::cout << "ERROR: " << ex.what() << "\n";
         }
     }
-    
+
     return 0;
 }

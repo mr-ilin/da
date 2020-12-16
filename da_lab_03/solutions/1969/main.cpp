@@ -21,7 +21,7 @@ int main() {
                 // Добавление
                 std::cin >> key >> value;
                 key.ToUpperCase();
-                tree.Insert(std::move(key), std::move(value), printResult);
+                tree.Insert(key, value, printResult);
             } else if (cmd == "-") {
                 // Удаление
                 std::cin >> key;
