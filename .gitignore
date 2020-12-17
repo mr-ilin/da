@@ -47,6 +47,8 @@ Extra/
 extra
 build/*
 .cmake
+solution*
+solution/
 
 ### CMake Patch ###
 # External projects
