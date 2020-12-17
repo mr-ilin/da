@@ -12,17 +12,17 @@ int main(int argc, const char * argv[]) {
     std::vector<std::vector<std::string>> text;
     std::vector<std::string> pattern;
     
-    char c;
-    bool patternLine = true;
+    char letter;
+    bool firstLine = true;
     std::vector<std::string> currentLine;
     std::string currentStr;
-    do {
-        c = getchar(); // Считываем текущий символ
-        
+    
+    while ((letter = getchar()) != EOF) {
         // Если пропался пробельный символ
-        if (isSpaceCh(c)) {
+        if (isSpaceCh(letter)) {
             // Проверка на пустую строчку
-            if (currentLine.empty() && currentStr.empty() && c == '\n') {
+            // if (currentLine.empty() && currentStr.empty() && c == '\n') {
+            if (currentLine.empty() && currentStr.empty()) {
                 continue;
             }
             
@@ -30,10 +30,10 @@ int main(int argc, const char * argv[]) {
             currentStr.clear();
             
             // Если конец строки
-            if (c == '\n') {
-                if (patternLine) {
+            if (letter == '\n') {
+                if (firstLine) {
                     pattern = std::move(currentLine); // Перемещает текущую строку в образец
-                    patternLine = false;
+                    firstLine = false;
                 } else {
                     text.push_back(std::move(currentLine)); // Добавляем текущую строку в конец
                 }
@@ -43,25 +43,11 @@ int main(int argc, const char * argv[]) {
             continue;
         }
         
-        currentStr.push_back(std::tolower(c));
-    } while (c != EOF);
-    
-    std::cout << "PATTERN = \" \n";
-    for (auto word : pattern) {
-        std::cout << word << " ";
+        currentStr.push_back(std::tolower(letter));
+        letter = getchar();
     }
-    std::cout << "\" \n";
     
-    std::cout << "TEXT = \" \n";
-    for (auto line : text) {
-        for (auto word : line) {
-            std::cout << word << " ";
-        }
-        std::cout << "\n";
-    }
-    std::cout << "\" \n";
-    
-    //KMPSearch(text, pattern);
+    KMPSearch(text, pattern);
     
     return 0;
 }

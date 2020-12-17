@@ -47,8 +47,9 @@ Extra/
 extra
 build/*
 .cmake
-solution*
-solution/
+solution
+solution.tar
+solution/*
 
 ### CMake Patch ###
 # External projects
@@ -99,3 +100,4 @@ Temporary Items
 *.xcworkspacedata
 *.plist
 *.xcbkptlist
+*.xcscheme

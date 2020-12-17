@@ -1,10 +1,12 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -pedantic -Wall #-O2
+CXXFLAGS = -std=c++17 -pedantic -Wall -O2
 
 EXECUTABLE = solution
 BENCHMARK  = benchmark
 SRC = main.cpp kmp.cpp
 OBJ = $(SRC:.cpp=.o)
+
+all: $(EXECUTABLE)
 
 debug: CXXFLAGS += -g
 debug: $(EXECUTABLE)
