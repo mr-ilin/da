@@ -50,6 +50,7 @@ build/*
 solution
 solution.tar
 solution/*
+da_lab_04_Xcode/
 
 ### CMake Patch ###
 # External projects

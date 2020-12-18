@@ -15,35 +15,15 @@ std::vector<size_t> CountPrefixFunction (const std::vector<std::string>& str) {
         }
         sp[i] = lastPrefix;
     }
+    sp.push_back(0);
     return sp;
 }
 
-void KMPSearch(const std::string& text, const std::string& sample) {
-    size_t prefix[sample.length()];
-     
-    size_t last_prefix = prefix[0] = 0;
-    for (size_t i=1; i<sample.length(); i++) {
-        while (last_prefix > 0 && sample[last_prefix] != sample[i])
-            last_prefix = prefix[last_prefix-1];
- 
-        if (sample[last_prefix] == sample[i])
-            last_prefix++;
- 
-        prefix[i] = last_prefix;
+bool EqualToNextPatternWord(const std::vector<std::string>& pattern, const std::string& str, size_t idx) {
+    if (idx >= pattern.size()) {
+        return false;
     }
-    
-    last_prefix = 0;
-    for (size_t i=0; i<text.length(); i++) {
-        while (last_prefix > 0 && sample[last_prefix] != text[i])
-            last_prefix = prefix[last_prefix-1];
- 
-        if (sample[last_prefix] == text[i])
-            last_prefix++;
- 
-        if (last_prefix == sample.length()) {
-            std::cout << i + 1 - sample.length() << std::endl;
-        }
-    }
+    return pattern[idx] == str;
 }
 
 size_t KMPSearch(const std::vector<std::vector<std::string>>& text, const std::vector<std::string>& pattern) {
@@ -54,7 +34,7 @@ size_t KMPSearch(const std::vector<std::vector<std::string>>& text, const std::v
     for (size_t lineIdx = 0; lineIdx < text.size(); ++lineIdx) {
         for (size_t wordIdx = 0; wordIdx < text[lineIdx].size(); ++wordIdx)
         {
-            while ((lastPrefix > 0) && (pattern[lastPrefix] != text[lineIdx][wordIdx])) {
+            while ((lastPrefix > 0) && (!EqualToNextPatternWord(pattern, text[lineIdx][wordIdx], lastPrefix))) {
                 lastPrefix = patternPrefix[lastPrefix - 1];
             }
                 
@@ -63,13 +43,11 @@ size_t KMPSearch(const std::vector<std::vector<std::string>>& text, const std::v
             }
      
             if (lastPrefix == pattern.size()) {
-                --lastPrefix; // tricky???
                 ++occurrances;
                 
                 #ifndef BENCH
-                size_t patSize = pattern.size();
                 size_t entryLine = lineIdx;
-                long long entryWord = wordIdx - (patSize - 1);
+                long long entryWord = wordIdx - (pattern.size() - 1);
                 while(entryWord < 0) {
                     --entryLine;
                     entryWord += text[entryLine].size();

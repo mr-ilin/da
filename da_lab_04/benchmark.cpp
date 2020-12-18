@@ -28,9 +28,11 @@ void RandomLine(size_t maxCount, std::vector<std::string>& strs) {
 }
 
 int main(int argc, const char * argv[]) {
-    size_t linesCnt = 100000;
-//    std::cout << "Enter amount of lines: ";
-//    std::cin >> linesCnt;
+    std::srand(static_cast<unsigned int>(std::time(0)));
+    
+    std::cout << "Enter amount of lines: ";
+    size_t linesCnt;
+    std::cin >> linesCnt;
     
     std::string patternStr = "one two three four4 5fiv5e 9120asD one two three";
     std::vector<std::string> pattern = {
@@ -42,13 +44,14 @@ int main(int argc, const char * argv[]) {
     std::vector<std::vector<std::string>> text;
     std::string textStr;
     
-    const int freq = 5;
+    const int maxLineLen = 20;
+    const int patternFrequency = 5;
     int occurrances = 0;
     for (size_t i = 0; i < linesCnt; ++i) {
         std::vector<std::string> line;
-        RandomLine(20, line);
+        RandomLine(maxLineLen, line);
         
-        if ((rand() % freq) == 0) {
+        if ((rand() % patternFrequency) == 0) {
             ++occurrances;
             size_t idx = 0;
             if (line.size() != 0) {
@@ -67,6 +70,7 @@ int main(int argc, const char * argv[]) {
             textStr += (str + " ");
         }
     }
+    
     std::cout << "TOTAL OCCURRANCES = " << occurrances << std::endl;
     
     std::chrono::time_point<std::chrono::system_clock> start, end;
@@ -88,18 +92,11 @@ int main(int argc, const char * argv[]) {
     end = std::chrono::system_clock::now();
     kmpTime = std::chrono::duration_cast<timeDuration>(end - start).count();
     
-    start = std::chrono::system_clock::now();
-    KMPSearch(text, pattern);
-    end = std::chrono::system_clock::now();
-    int64_t extra = std::chrono::duration_cast<timeDuration>(end - start).count();
-    
     std::cout << "===============================" << std::endl;
     std::cout << "  KMP SEARCH RESULT = " << kmpRes << std::endl;
     std::cout << "    KMP SEARCH TIME = " << kmpTime << " ms" << std::endl;
     std::cout << "STRING::FIND RESULT = " << findRes << std::endl;
     std::cout << "  STRING::FIND TIME = " << findTime << " ms" << std::endl;
-    std::cout << std::endl;
-    std::cout << "KMP ON STD::STRING  = " << extra << " ms" << std::endl;
     std::cout << "===============================" << std::endl;
     
     return 0;
