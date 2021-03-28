@@ -5,18 +5,20 @@ import random
 
 # Максимально возможное значение числа.
 MAX_POW = 40
-SHORT_POW = 2
-MAX_VALUE = 100 ** MAX_POW
+SHORT_POW = 5
 MIN_VALUE = 1
 
 def get_random_int():
     return random.randint(MIN_VALUE, 100 ** random.randint(1, MAX_POW))
 
 def get_random_short():
-    return random.randint(MIN_VALUE, 100 ** random.randint(1, SHORT_POW))
+    return random.randint(MIN_VALUE, 10 ** random.randint(1, SHORT_POW))
 
 def get_random_nums():
     return get_random_int(), get_random_int()
+
+def get_random_shorts():
+    return get_random_short(), get_random_short()
 
 def get_answer(num1, num2, operation):
     if operation == "+":
@@ -65,11 +67,10 @@ def main():
              open(f'{filename_pattern}.a', 'w') as answer_file:
             for _ in range(0, tests_count):
                 # Генерируем рандомные большие числа.
-                num1 = get_random_int()
                 if operation == "^":
-                    num2 = get_random_short()
+                    num1, num2 = get_random_shorts()
                 else:
-                    num2 = get_random_int()
+                    num1, num2 = get_random_nums()
                 # num1, num2 = get_random_nums()
                 # Записываем в файл получившийся тест.
                 test_file.write(f"{num1}\n{num2}\n{operation}\n")

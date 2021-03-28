@@ -1,8 +1,11 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -pedantic -Wall -Wextra -Wno-unused-variable -fsanitize=address
+CXXFLAGS = -std=c++17 -pedantic -Wall -Wno-unused-variable
+LDFLAGS = 
 
 EXECUTABLE = solution
-BENCH  = benchmark
+DEBUG_EXE  = debug.out
+BENCH_EXE  = benchmark
+TEST       = unit_test
 
 EXE_SRC = main.cpp biggest_int.cpp
 EXE_OBJ = $(EXE_SRC:.cpp=.o)
@@ -10,22 +13,32 @@ EXE_OBJ = $(EXE_SRC:.cpp=.o)
 BENCH_SRC = benchmark.cpp biggest_int.cpp
 BENCH_OBJ = $(BENCH_SRC:.cpp=.o)
 
-all: $(EXECUTABLE)
+TEST_SRC = unit_tests.cpp biggest_int.cpp
+TEST_OBJ = $(TEST_SRC:.cpp=.o)
 
-debug : CXXFLAGS += -g
+all : $(EXECUTABLE)
+
+debug : CXXFLAGS += -g -fsanitize=address
+debug : EXECUTABLE = $(DEBUG_EXE)
 debug : $(EXECUTABLE)
 
-test : CXXFLAGS += -DBENCH
-test : $(BENCH)
+benchmark : CXXFLAGS += -lgmp
+benchmark : $(BENCH)
+
+test : LD_FLAGS += -lgtest -lgtest_main
+test : $(TEST)
 
 $(EXECUTABLE) : $(EXE_OBJ)
 	$(CXX) $(CXXFLAGS) $(EXE_OBJ) -o $(EXECUTABLE)
 
-$(BENCH) : $(BENCH_OBJ)
-	$(CXX) $(CXXFLAGS) $(BENCH_OBJ) -o $(BENCH)
+$(BENCH_EXE) : $(BENCH_OBJ)
+	$(CXX) $(CXXFLAGS) $(BENCH_OBJ) -o $(BENCH_EXE)
+
+$(TEST) : $(TEST_OBJ)
+	$(CXX) $(CXXFLAGS) $(TEST_OBJ) -o $(TEST) $(LD_FLAGS)
 
 .cpp.o:
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f *.o $(EXECUTABLE) $(BENCH)
+	rm -f *.o $(EXECUTABLE) $(DEBUG_EXE) $(BENCH_EXE) $(TEST)

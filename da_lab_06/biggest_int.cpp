@@ -1,6 +1,6 @@
 #include "biggest_int.hpp"
-
-// #include <algorithm>
+#include <algorithm>
+#include <sstream>
 
 namespace NBiggestInt {
 
@@ -8,18 +8,41 @@ TBiggestInt::TBiggestInt(const std::string & str) {
     this->Initialize(str);
 }
 
-TBiggestInt::TBiggestInt(const size_t & length, const int & value) 
+TBiggestInt::TBiggestInt(const size_t & length, const long long & value) 
     : digits(length, value)
 {}
 
 void TBiggestInt::Initialize(const std::string & str) {
-    digits.clear();
-    digits.resize(str.size() / TBiggestInt::RADIX);
-    for (size_t i = str.size() - 1; i < str.size(); --i) {
-        digits[i] = static_cast<decltype(digits)::value_type>(str[i] - '0');
+    long long startIdx = 0;
+    while (startIdx < str.size() && str[startIdx] == '0') {
+        ++startIdx;
     }
-    std::reverse(std::begin(digits), std::end(digits));
-    DeleteLeadingZeros();
+    if (startIdx == str.size()) {
+        digits.push_back(0);
+        return;
+    }
+
+    digits.clear();
+    size_t digitsSize = (str.size() - startIdx) / RADIX;
+    if ((str.size() - startIdx) % RADIX != 0) {
+        ++digitsSize;
+    }
+    digits.resize(digitsSize);
+
+    size_t digitsCount = 0;
+    for (long long i = str.size() - 1; i >= startIdx; i -= RADIX) {
+        long long currDigit = 0;
+        long long digitStart = i - RADIX + 1;
+        if (digitStart < 0 || digitStart <= startIdx) {
+            digitStart = 0;
+        }
+        for (long long j = digitStart; j <= i; ++j) {
+            currDigit = currDigit * 10 + str[j] - '0';
+        }
+
+        digits[digitsCount] = currDigit;
+        ++digitsCount;
+    }
 }
 
 size_t TBiggestInt::Size() const {
@@ -50,18 +73,21 @@ std::istream& operator>>(std::istream & is, TBiggestInt & rhs) {
 }
 
 std::ostream& operator<<(std::ostream & os, const TBiggestInt & rhs) {
-    if (rhs.digits.empty()) {
-        os << "0";
-        return os;
-    }
-
-    for (size_t i = rhs.Size() - 1; i < rhs.Size(); --i) {
-        os << rhs.digits[i];
+    os << rhs.digits[rhs.Size()- 1];
+    for (long long i = rhs.Size() - 2; i >= 0; --i) {
+        os << std::setfill('0') << std::setw(TBiggestInt::RADIX) << rhs.digits[i]; 
     }
     return os;
 }
 
+std::string TBiggestInt::GetString() const {
+    std::stringstream ss;
+    ss << *this;
+    return ss.str();
+}
+
 // Operators for TBiggestInt
+
 TBiggestInt TBiggestInt::operator+(const TBiggestInt & rhs) const {
     size_t resSize = std::max(rhs.Size(), Size());
     TBiggestInt res(resSize);
@@ -75,8 +101,8 @@ TBiggestInt TBiggestInt::operator+(const TBiggestInt & rhs) const {
         if (i < Size()) {
             sum += digits[i];
         }
-        carry = sum / TBiggestInt::BASE;
-        res.digits[i] = sum % TBiggestInt::BASE;
+        carry = sum / BASE;
+        res.digits[i] = sum % BASE;
     }
     if (carry != 0) {
         res.digits.push_back(carry);
@@ -102,11 +128,11 @@ TBiggestInt TBiggestInt::operator-(const TBiggestInt & rhs) const {
 
         if (diff < 0) {
             carry = 1;
-            diff += TBiggestInt::BASE;
+            diff += BASE;
         } else {
             carry = 0;
         }
-        res.digits[i] = diff % TBiggestInt::BASE;
+        res.digits[i] = diff % BASE;
     }
     res.DeleteLeadingZeros();
     return res;
@@ -114,17 +140,15 @@ TBiggestInt TBiggestInt::operator-(const TBiggestInt & rhs) const {
 
 TBiggestInt TBiggestInt::operator*(const TBiggestInt & rhs) const {
     TBiggestInt res(Size() + rhs.Size());
-    for (size_t i = 0; i < Size(); ++i)
-    {
+    for (size_t i = 0; i < Size(); ++i) {
         long long carry = 0;
-        for (size_t j = 0; j < rhs.Size() || carry > 0; ++j)
-        {
-            int current = res.digits[i + j] + carry;
+        for (size_t j = 0; j < rhs.Size() || carry > 0; ++j) {
+            long long current = res.digits[i + j] + carry;
             if (j < rhs.Size()) {
                 current += digits[i] * rhs.digits[j];
             }
-            res.digits[i + j] = current % TBiggestInt::BASE;
-            carry = current / TBiggestInt::BASE;
+            res.digits[i + j] = current % BASE;
+            carry = current / BASE;
         }
     }
     res.DeleteLeadingZeros();
@@ -144,7 +168,7 @@ TBiggestInt TBiggestInt::operator/(const TBiggestInt & rhs) const {
 
         long long currResDigit = 0;
         long long leftBound = 0;
-        long long rightBound = TBiggestInt::BASE;
+        long long rightBound = BASE;
         while (leftBound <= rightBound) {
             long long middle = (leftBound + rightBound) / 2;
             TBiggestInt tmp = rhs * middle;
@@ -171,31 +195,27 @@ TBiggestInt TBiggestInt::Pow(const TBiggestInt & degree) const {
         throw std::logic_error("Error: 0^0 is uncertain");
     }
 
+    TBiggestInt res("1");
     if (degree == 0) {
-        return TBiggestInt("1");
+        return res;
     }
 
-    TBiggestInt res;
-    if (degree % 2 == 0) {
-        res = this->Pow(degree / 2);
-        return res * res;
-    }
+    TBiggestInt curr = *this;
+    TBiggestInt currDegree = degree;
+    while (currDegree > 0) {
+        if (currDegree.digits.back() % 2 != 0) {
+            res = res * curr;
+        }
 
-    res = this->Pow(degree - 1);
-    return (*this) * res;
+        curr = curr * curr;
+        currDegree = currDegree / 2;
+    }
+    return res;
 }
 
 // Operators for long longs
 
-bool isValidShortNumber(const long long & rhs, const int base) {
-    return rhs < base;
-}
-
 TBiggestInt TBiggestInt::operator-(const long long & rhs) const {
-    if (!isValidShortNumber(rhs, BASE)) {
-        throw std::runtime_error("Error: invalid short number " + std::to_string(rhs) + " in operator-");
-    }
-
     if (Size() == 1 && digits[0] < rhs) {
         throw std::logic_error("Error: trying to subtract bigger number from smaller");
     }
@@ -212,10 +232,6 @@ TBiggestInt TBiggestInt::operator-(const long long & rhs) const {
 }
 
 TBiggestInt TBiggestInt::operator*(const long long & rhs) const {
-    if (!isValidShortNumber(rhs, BASE)) {
-        throw std::runtime_error("Error: invalid short number " + std::to_string(rhs) + " in operator*");
-    }
-
     TBiggestInt res(Size());
     long long carry = 0;
     for (size_t i = 0; i < Size() || carry > 0; ++i) {
@@ -225,22 +241,18 @@ TBiggestInt TBiggestInt::operator*(const long long & rhs) const {
         } else {
             currDigit += digits[i] * rhs;
         }
-        res.digits[i] = currDigit % TBiggestInt::BASE;
-        carry = currDigit / TBiggestInt::BASE;
+        res.digits[i] = currDigit % BASE;
+        carry = currDigit / BASE;
     }
     res.DeleteLeadingZeros();
     return res;
 }
 
 TBiggestInt TBiggestInt::operator/(const long long & rhs) const {
-    if (!isValidShortNumber(rhs, BASE)) {
-        throw std::runtime_error("Error: invalid short number " + std::to_string(rhs) + " in operator/");
-    }
-
     TBiggestInt res(Size());
     long long carry = 0;
     for (size_t i = Size() - 1; i < Size(); --i) {
-        long long currDigit = carry * TBiggestInt::BASE + digits[i];
+        long long currDigit = carry * BASE + digits[i];
         res.digits[i] = currDigit / rhs;
         carry = currDigit % rhs;
     }
@@ -249,13 +261,9 @@ TBiggestInt TBiggestInt::operator/(const long long & rhs) const {
 }
 
 long long TBiggestInt::operator%(const long long & rhs) const {
-    if (!isValidShortNumber(rhs, BASE)) {
-        throw std::runtime_error("Error: invalid short number " + std::to_string(rhs) + " in operator%");
-    }
-
     long long carry = 0;
     for (size_t i = Size() - 1; i < Size(); --i) {
-        carry = ( carry * TBiggestInt::BASE + digits[i] ) % rhs;
+        carry = ( carry * BASE + digits[i] ) % rhs;
     }
     return carry;
 }
@@ -294,13 +302,6 @@ bool TBiggestInt::operator> (const TBiggestInt & rhs) const {
     return false; 
 }
 
-bool TBiggestInt::operator==(const long long & rhs) const {
-    if (Size() != 1) {
-        return false;
-    }
-    return digits.back() == rhs;
-}
-
 bool TBiggestInt::operator==(const TBiggestInt & rhs) const {
     if (Size() != rhs.Size()) {
         return false;
@@ -313,6 +314,20 @@ bool TBiggestInt::operator==(const TBiggestInt & rhs) const {
     }
 
     return true;
+}
+
+bool TBiggestInt::operator==(const long long & rhs) const {
+    if (Size() != 1) {
+        return false;
+    }
+    return digits.back() == rhs;
+}
+
+bool TBiggestInt::operator> (const long long & rhs) const {
+    if (Size() > 1) {
+        return true;
+    }
+    return digits.back() > rhs;
 }
 
 } // namespace NBiggestInt

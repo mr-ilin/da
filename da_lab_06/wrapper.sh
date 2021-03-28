@@ -34,11 +34,11 @@ function main()
     exit 1
   fi
 
-  # log_info "Making unittest..."
-  # if ! make test ; then
-  #   log_error "ERROR: Failed to run unittest."
-  #   return 1
-  # fi
+  log_info "Making unittest..."
+  if ! make test ; then
+    log_error "ERROR: Failed to run unittest."
+    return 1
+  fi
 
   local test_dir=tests
   rm -rf ${test_dir}
