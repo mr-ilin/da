@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -pedantic -Wall -Wno-unused-variable
+CXXFLAGS = -std=c++17 -pedantic -Wall -Wno-unused-variable -O3
 LDFLAGS = 
 
 EXECUTABLE = solution
@@ -22,7 +22,7 @@ debug : CXXFLAGS += -g -fsanitize=address
 debug : EXECUTABLE = $(DEBUG_EXE)
 debug : $(EXECUTABLE)
 
-benchmark : CXXFLAGS += -lgmp
+benchmark : CXXFLAGS += -lgmp -lgmpxx
 benchmark : $(BENCH)
 
 test : LD_FLAGS += -lgtest -lgtest_main

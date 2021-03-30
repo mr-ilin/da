@@ -5,11 +5,13 @@
 int main() {
     std::ios_base::sync_with_stdio(false);
 
-    NBiggestInt::TBiggestInt num1, num2;
+    std::string str1, str2;
     std::string op;
 
-    while(std::cin >> num1 >> num2 >> op) {
+    while(std::cin >> str1 >> str2 >> op) {
         try {
+            NBiggestInt::TBiggestInt num1(str1);
+            NBiggestInt::TBiggestInt num2(str2);
             if (op == "+") {
                 std::cout << num1 + num2 << "\n";
             } else if (op == "-") {

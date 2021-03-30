@@ -3,7 +3,7 @@
 function main()
 {
     local files=("main.cpp" "Makefile" "biggest_int.hpp" "biggest_int.cpp" "benchmark.cpp" "unit_tests.cpp")
-    local dir="./solution_folder"
+    local dir="./solution"
 
     if [ ! -d ${dir} ]; then
         mkdir ${dir}

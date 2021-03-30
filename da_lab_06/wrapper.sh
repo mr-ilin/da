@@ -26,46 +26,68 @@ function log_error()
 
 function main()
 {
-  local bin=solution
+  local bin="solution"
+  local makefile_target="all"
+
+  local tests_type="test"
+  if [[ "$#" -eq 2 ]]; then
+    if [ $2 == "benchmark" ]; then
+      tests_type=${2}
+      bin="benchmark"
+      makefile_target="benchmark"
+    fi
+  fi
+  declare -a failed_tests
 
   log_info "Compiling..."
-  if ! make ; then
+  if ! make ${makefile_target}; then
     log_error "ERROR: Failed to compile file."
     exit 1
   fi
 
-  log_info "Making unittest..."
-  if ! make test ; then
-    log_error "ERROR: Failed to run unittest."
-    return 1
+  if [ ${tests_type} != "benchmark" ]; then
+    log_info "Making unittest..."
+    if ! make test ; then
+      log_error "ERROR: Failed to run unittest."
+      return 1
+    fi
   fi
-
+  
   local test_dir=tests
   rm -rf ${test_dir}
   mkdir -p ${test_dir}
-  local examples_cnt=${1}
-  declare -a failed_tests
+  local tests_cnt=${1}
 
-  log_info "Generating tests (examples for each test=[${examples_cnt}])..."
-  if ! python3 tests_generator.py ${test_dir} ${examples_cnt} ; then
+  log_info "Generating tests (examples for each test=[${tests_cnt}])..."
+  if ! python3 tests_generator.py ${test_dir} ${tests_cnt} ${tests_type}; then
     log_error "ERROR: Failed to python generate tests."
     return 1
   fi
 
+  last_answer="answer_file"
   for test_file in $(ls ${test_dir}/*.t); do
     log_info "Executing ${test_file}..."
-    if ! ./${bin} < ${test_file} > last_answer ; then
+
+    if [ ${tests_type} == "benchmark" ]; then
+      if ! ./${bin} < ${test_file}; then
         log_error "ERROR"
         failed_tests+=( "${test_file}" )
         continue
-    fi
-    local answer_file="${test_file%.*}"
-
-    if ! diff -u "${answer_file}.a" last_answer ; then
-        echo "Failed"
-        failed_tests+=( "${test_file}" )
+      fi
     else
-        echo "OK"
+      if ! ./${bin} < ${test_file} >${last_answer}; then
+        log_error "ERROR"
+        failed_tests+=( "${test_file}" )
+        continue
+      fi
+
+      local answer_file="${test_file%.*}"
+      if ! diff -u "${answer_file}.a" ${last_answer} ; then
+          echo "Failed"
+          failed_tests+=( "${test_file}" )
+      else
+          echo "OK"
+      fi
     fi
   done
 

@@ -25,9 +25,9 @@ TEST(TBiggestIntSuite, leadingZerosTest) {
 }
 
 TEST(TBiggestIntSuite, sumTest) {
-    std::vector<std::string> lhs{"0", "101", "101", "1001009"};
-    std::vector<std::string> rhs{"1", "010", "019", "1000001"};
-    std::vector<std::string> exp{"1", "111", "120", "2001010"};
+    std::vector<std::string> lhs{"0", "0", "101", "101", "1001009"};
+    std::vector<std::string> rhs{"0", "1", "010", "019", "1000001"};
+    std::vector<std::string> exp{"0", "1", "111", "120", "2001010"};
 
     for (size_t i = 0; i < lhs.size(); ++i) {
         NBiggestInt::TBiggestInt num1(lhs[i]);
@@ -47,9 +47,9 @@ TEST(TBiggestIntSuite, subtractionTest) {
 
     // Value test
     {
-        std::vector<std::string> lhs{"1", "101", "101", "12345"};
-        std::vector<std::string> rhs{"0", "010", "019", "123"};
-        std::vector<std::string> exp{"1", "91",  "82",  "12222"};
+        std::vector<std::string> lhs{"0", "1", "101", "101", "12345"};
+        std::vector<std::string> rhs{"0", "0", "010", "019", "123"};
+        std::vector<std::string> exp{"0", "1", "91",  "82",  "12222"};
 
         for (size_t i = 0; i < lhs.size(); ++i) {
             NBiggestInt::TBiggestInt num1(lhs[i]);
@@ -60,10 +60,10 @@ TEST(TBiggestIntSuite, subtractionTest) {
     }
 }
 
-TEST(TBiggestIntSuite, multiplyTest) {
-    std::vector<std::string> lhs{"1", "101",  "101",  "123456789123"};
-    std::vector<std::string> rhs{"0", "010",  "019",  "123456"};
-    std::vector<std::string> exp{"0", "1010", "1919", "15241481357969088"};
+TEST(TBiggestIntSuite, multiplicationTest) {
+    std::vector<std::string> lhs{"0", "1", "101",  "101",  "123456789123"};
+    std::vector<std::string> rhs{"0", "0", "010",  "019",  "123456"};
+    std::vector<std::string> exp{"0", "0", "1010", "1919", "15241481357969088"};
 
     for (size_t i = 0; i < lhs.size(); ++i) {
         NBiggestInt::TBiggestInt num1(lhs[i]);
@@ -76,7 +76,7 @@ TEST(TBiggestIntSuite, multiplyTest) {
 TEST(TBiggestIntSuite, divisionTest) {
     // Exception test
     {
-        NBiggestInt::TBiggestInt num1("123457924352");
+        NBiggestInt::TBiggestInt num1("0");
         NBiggestInt::TBiggestInt num2("0");
         ASSERT_THROW(num1 / num2, std::logic_error);
     }
@@ -116,6 +116,34 @@ TEST(TBiggestIntSuite, powTest) {
             NBiggestInt::TBiggestInt expected(exp[i]);
             ASSERT_EQ(expected, num1.Pow(num2)) << num1 << " ^ " << num2 << "!=" << expected;
         }
+    }
+}
+
+TEST(TBiggestIntSuite, shiftTest) {
+    std::vector<std::string> lhs{"0", "1",       "12"};
+    std::vector<long long>   rhs{100,  1,         2};
+    std::vector<std::string> exp{"0", "1000000", "12000000000000"};
+
+    for (size_t i = 0; i < lhs.size(); ++i) {
+        NBiggestInt::TBiggestInt num1(lhs[i]);
+        long long num2 = rhs[i];
+        NBiggestInt::TBiggestInt expected(exp[i]);
+        
+        num1.Shift(num2);
+        ASSERT_EQ(expected, num1) << num1 << " << " << num2 << "!=" << expected;
+    }
+}
+
+TEST(TBiggestIntSuite, karatsubaMultiplicationTest) {
+    std::vector<std::string> lhs{"1", "101",  "101",  "123456789123"};
+    std::vector<std::string> rhs{"0", "010",  "019",  "123456"};
+    std::vector<std::string> exp{"0", "1010", "1919", "15241481357969088"};
+
+    for (size_t i = 0; i < lhs.size(); ++i) {
+        NBiggestInt::TBiggestInt num1(lhs[i]);
+        NBiggestInt::TBiggestInt num2(rhs[i]);
+        NBiggestInt::TBiggestInt expected(exp[i]);
+        ASSERT_EQ(expected, NBiggestInt::TBiggestInt::KaratsubaMultiplication(std::move(num1), std::move(num2))) << num1 << " * " << num2 << "!=" << expected;
     }
 }
 

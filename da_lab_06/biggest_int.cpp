@@ -8,7 +8,7 @@ TBiggestInt::TBiggestInt(const std::string & str) {
     this->Initialize(str);
 }
 
-TBiggestInt::TBiggestInt(const size_t & length, const long long & value) 
+TBiggestInt::TBiggestInt(const size_t & length, const long long value) 
     : digits(length, value)
 {}
 
@@ -190,6 +190,70 @@ TBiggestInt TBiggestInt::operator/(const TBiggestInt & rhs) const {
 
 }
 
+void TBiggestInt::Shift(const long long degree) {
+    if (*this == 0) {
+        return;
+    }
+
+    size_t oldSize = digits.size();
+    digits.resize(digits.size() + degree);
+
+    for (long long i = oldSize - 1; i >= 0; --i) {
+        digits[i + degree] = digits[i];
+    }
+    for (long long i = 0; i < degree; ++i) {
+        digits[i] = 0;
+    }
+}
+
+TBiggestInt TBiggestInt::KaratsubaMultiplication(TBiggestInt && lhs, TBiggestInt && rhs) {
+    size_t length = std::max(lhs.Size(), rhs.Size());
+    if (length == 1) {
+        return lhs * rhs.digits.back();
+    }
+
+    if (length % 2 != 0) {
+        ++length;
+    }
+
+    lhs.digits.resize(length);
+    rhs.digits.resize(length);
+
+    TBiggestInt leftHalfLhs;
+    TBiggestInt rightHalfLhs;
+    std::copy(std::begin(lhs.digits), std::begin(lhs.digits) + (length / 2), std::back_inserter(rightHalfLhs.digits));
+    std::copy(std::begin(lhs.digits) + (length / 2), std::end(lhs.digits) , std::back_inserter(leftHalfLhs.digits));
+
+    TBiggestInt leftHalfRhs;
+    TBiggestInt rightHalfRhs;
+    std::copy(std::begin(rhs.digits), std::begin(rhs.digits) + (length / 2), std::back_inserter(rightHalfRhs.digits));
+    std::copy(std::begin(rhs.digits) + (length / 2), std::end(rhs.digits) , std::back_inserter(leftHalfRhs.digits));
+
+    // res = BASE^n * Prod1 + BASE^(n/2)*(Prod2 - Prod1 - Prod3) + Prod 3
+    TBiggestInt Term1 = KaratsubaMultiplication(std::move(leftHalfLhs), std::move(leftHalfRhs));
+    TBiggestInt Term2 = KaratsubaMultiplication(leftHalfLhs + rightHalfLhs, leftHalfRhs + rightHalfRhs);
+    TBiggestInt Term3 = KaratsubaMultiplication(std::move(rightHalfLhs), std::move(rightHalfRhs));
+    
+    Term2 = Term2 - Term1 - Term3;
+    Term1.Shift(length);
+    Term2.Shift(length / 2);
+    
+    TBiggestInt result = Term1 + Term2 + Term3;
+
+    long long carry = 0;
+    for (long long i = 0; i < result.Size(); ++i) {
+        result.digits[i] += carry;
+        carry = result.digits[i] / BASE;
+        result.digits[i] %= BASE;
+    }
+
+    if (carry != 0) {
+        result.digits.push_back(carry);
+    }
+
+    return result;
+}
+
 TBiggestInt TBiggestInt::Pow(const TBiggestInt & degree) const {
     if (*this == 0 && degree == 0) {
         throw std::logic_error("Error: 0^0 is uncertain");
@@ -215,7 +279,7 @@ TBiggestInt TBiggestInt::Pow(const TBiggestInt & degree) const {
 
 // Operators for long longs
 
-TBiggestInt TBiggestInt::operator-(const long long & rhs) const {
+TBiggestInt TBiggestInt::operator-(const long long rhs) const {
     if (Size() == 1 && digits[0] < rhs) {
         throw std::logic_error("Error: trying to subtract bigger number from smaller");
     }
@@ -231,7 +295,7 @@ TBiggestInt TBiggestInt::operator-(const long long & rhs) const {
     return res;
 }
 
-TBiggestInt TBiggestInt::operator*(const long long & rhs) const {
+TBiggestInt TBiggestInt::operator*(const long long rhs) const {
     TBiggestInt res(Size());
     long long carry = 0;
     for (size_t i = 0; i < Size() || carry > 0; ++i) {
@@ -248,7 +312,7 @@ TBiggestInt TBiggestInt::operator*(const long long & rhs) const {
     return res;
 }
 
-TBiggestInt TBiggestInt::operator/(const long long & rhs) const {
+TBiggestInt TBiggestInt::operator/(const long long rhs) const {
     TBiggestInt res(Size());
     long long carry = 0;
     for (size_t i = Size() - 1; i < Size(); --i) {
@@ -260,7 +324,7 @@ TBiggestInt TBiggestInt::operator/(const long long & rhs) const {
     return res;
 }
 
-long long TBiggestInt::operator%(const long long & rhs) const {
+long long TBiggestInt::operator%(const long long rhs) const {
     long long carry = 0;
     for (size_t i = Size() - 1; i < Size(); --i) {
         carry = ( carry * BASE + digits[i] ) % rhs;
@@ -316,14 +380,14 @@ bool TBiggestInt::operator==(const TBiggestInt & rhs) const {
     return true;
 }
 
-bool TBiggestInt::operator==(const long long & rhs) const {
+bool TBiggestInt::operator==(const long long rhs) const {
     if (Size() != 1) {
         return false;
     }
     return digits.back() == rhs;
 }
 
-bool TBiggestInt::operator> (const long long & rhs) const {
+bool TBiggestInt::operator> (const long long rhs) const {
     if (Size() > 1) {
         return true;
     }
