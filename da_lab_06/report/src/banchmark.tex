@@ -1,0 +1,70 @@
+\section{Тест производительности}
+
+Тест производительности представляет из себя сравнение производительности написанного класса \textit{TBiggestInt} с библиотекой \textit{GMP}. С помощью \textit{test\_generator.py} происходит генерация тестового файла, содержащего \textit{n} - ое количество входных данных для каждой операции. Сравнивается суммарное время выполнения операций каждого вида без учёта ввода для 100, 1000 тестовых данных.
+
+\begin{alltt}
+MacBook-Pro:da_lab_06 mr-ilin$ ./wrapper.sh 100 benchmark
+[2021-03-31 21:14:26] [INFO] Compiling...
+make: `benchmark' is up to date.
+[2021-03-31 21:14:28] [INFO] Generating tests (examples for each test=[100])...
+[2021-03-31 21:14:39] [INFO] Executing tests/01.t...
+===============================
+=====   ADDITION   =====
+  TBiggestInt Time = 34 ms
+          GMP Time = 20 ms
+=====  SUBTRACTION  =====
+  TBiggestInt Time = 12 ms
+          GMP Time = 15 ms
+===== MULTIPLICATION =====
+  TBiggestInt Time = 35 ms
+    Karatsuba Time = 10333 ms
+          GMP Time = 24 ms
+=====    DIVISION    =====
+  TBiggestInt Time = 2998 ms
+          GMP Time = 22 ms
+=====      POWER     =====
+  TBiggestInt Time = 57497501 ms
+          GMP Time = 19158 ms
+=====    LESS THEN   =====
+  TBiggestInt Time = 4 ms
+          GMP Time = 4 ms
+=====    EQUAL TO    =====
+  TBiggestInt Time = 3 ms
+          GMP Time = 2 ms
+          
+MacBook-Pro:da_lab_06 mr-ilin$ ./wrapper.sh 1000 benchmark
+[2021-03-31 21:20:16] [INFO] Compiling...
+make: `benchmark' is up to date.
+[2021-03-31 21:20:16] [INFO] Generating tests (examples for each test=[1000])...
+[2021-03-31 21:21:27] [INFO] Executing tests/01.t...
+===============================
+=====   ADDITION   =====
+  TBiggestInt Time = 222 ms
+          GMP Time = 160 ms
+=====  SUBTRACTION  =====
+  TBiggestInt Time = 100 ms
+          GMP Time = 89 ms
+===== MULTIPLICATION =====
+  TBiggestInt Time = 342 ms
+    Karatsuba Time = 100439 ms
+          GMP Time = 228 ms
+=====    DIVISION    =====
+  TBiggestInt Time = 28649 ms
+          GMP Time = 160 ms
+=====      POWER     =====
+  TBiggestInt Time = 372708199 ms
+          GMP Time = 139997 ms
+=====    LESS THEN   =====
+  TBiggestInt Time = 20 ms
+          GMP Time = 26 ms
+=====    EQUAL TO    =====
+  TBiggestInt Time = 27 ms
+          GMP Time = 29 ms
+===============================
+[2021-03-31 21:27:40] [INFO] No failed tests, hooray
+\end{alltt}
+
+Как видно, почти во всех случаях \textit{GMP} справляется быстрее, кроме операций сравнения.
+
+\pagebreak
+
