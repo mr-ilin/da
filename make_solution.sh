@@ -2,13 +2,16 @@
 
 function main()
 {
-    local files=("main.cpp" "Makefile" "biggest_int.hpp" "biggest_int.cpp" "benchmark.cpp" "unit_tests.cpp")
+    local files=("Makefile")
     local dir="./solution"
 
     if [ ! -d ${dir} ]; then
         mkdir ${dir}
     fi
     cp ${files[*]} ${dir}
+    cp *.cpp ${dir}
+    cp *.hpp ${dir}
+    cp *.h ${dir}
     tar -czvf solution.tar ${dir}
 
     rm -r ${dir}
