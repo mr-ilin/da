@@ -13,7 +13,7 @@ EXE_OBJ = $(EXE_SRC:.cpp=.o)
 BENCH_SRC = 
 BENCH_OBJ = $(BENCH_SRC:.cpp=.o)
 
-TEST_SRC = unit_tests.cpp
+TEST_SRC = unit_tests.cpp dp.cpp
 TEST_OBJ = $(TEST_SRC:.cpp=.o)
 
 all : $(EXECUTABLE)
@@ -22,7 +22,6 @@ debug : CXXFLAGS += -g -fsanitize=address -DDEBUG
 debug : EXECUTABLE = $(DEBUG_EXE)
 debug : $(EXECUTABLE)
 
-benchmark : CXXFLAGS += -lgmp -lgmpxx
 benchmark : $(BENCH)
 
 test : LD_FLAGS += -lgtest -lgtest_main
