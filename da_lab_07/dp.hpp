@@ -18,8 +18,8 @@ class TDPMatrix {
     private:
 
         struct dpCell {
-            int maxArea;   // Макс. площадь
-            int stripeRow; // Длина полосы до тек. точки
+            int maxArea;   // Макс. площадь 
+            int stripeRow; // Координата полосы
             int stripeCol;
             std::pair<int, int> rectangle; // Левая верхняя точка прямоугольника
         };
@@ -27,7 +27,7 @@ class TDPMatrix {
         std::vector<std::vector<bool> > matrix;
         std::vector<std::vector<dpCell> > dpMatrix;
 
-        // std::pair<int, int> prolongRect(const dpCell& curr, const std::pair<int, int> & rect) const;
+        std::pair<int, int> prolongRect(const dpCell& curr, const int x, const int y) const;
         int fillDpMatrix();
 };
 

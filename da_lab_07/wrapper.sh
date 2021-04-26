@@ -28,6 +28,7 @@ function main()
 {
   local bin="solution"
   local makefile_target="all"
+  local unit_test_exe="unit_test"
 
   declare -a failed_tests
 
@@ -39,8 +40,11 @@ function main()
 
   log_info "Making unittest..."
   if ! make test ; then
-    log_error "ERROR: Failed to run unittest."
+    log_error "ERROR: Failed to make unittest."
     return 1
+  fi
+  if ! ./${unit_test_exe} ; then
+    log_error "ERROR: Failed while running unittest."
   fi
   
   local test_dir=tests

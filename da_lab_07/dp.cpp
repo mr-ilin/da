@@ -46,12 +46,16 @@ namespace NMyDP {
         return result;
     }
 
-    // std::pair<int, int> prolongRect(const dpCell& curr, const std::pair<int, int> & rect) const {
-    //     return std::make_pair(
-    //         std::max(i + 1 - stripeRow, prevX),
-    //         std::max(j + 1 - stripeCol, prevY)
-    //     );
-    // }
+    std::pair<int, int> TDPMatrix::prolongRect(const dpCell& curr, const int x, const int y) const {
+        return std::make_pair(
+            std::max(curr.stripeRow, x),
+            std::max(curr.stripeCol, y)
+        );
+    }
+
+    int getRectArea(const std::pair<int, int> & rectangle, const int i, const int j) {
+        return (i - rectangle.first + 1) * (j - rectangle.second + 1);
+    }
 
     int TDPMatrix::fillDpMatrix() {
         int result = 0;
@@ -60,19 +64,23 @@ namespace NMyDP {
         for (int i = 0; i < rows; ++i)  {
             for (int j = 0; j < cols; ++j) {
                 if (!matrix[i][j]) {
-                    dpMatrix[i][j].stripeRow = 0;
-                    dpMatrix[i][j].stripeCol = 0;
+                    dpMatrix[i][j].stripeRow = -1;
+                    dpMatrix[i][j].stripeCol = -1;
                     dpMatrix[i][j].rectangle = std::make_pair(-1, -1);
                     dpMatrix[i][j].maxArea = 0;
                 } else {
                     // Обновляем макс. полосы по x и y
-                    dpMatrix[i][j].stripeRow = 1;
+                    dpMatrix[i][j].stripeRow = i;
                     if (i > 0) {
-                        dpMatrix[i][j].stripeRow += dpMatrix[i - 1][j].stripeRow ;
+                        if (matrix[i - 1][j]) {
+                            dpMatrix[i][j].stripeRow = dpMatrix[i - 1][j].stripeRow;
+                        }
                     }
-                    dpMatrix[i][j].stripeCol = 1;
+                    dpMatrix[i][j].stripeCol = j;
                     if (j > 0) {
-                        dpMatrix[i][j].stripeCol += dpMatrix[i][j - 1].stripeCol;
+                        if (matrix[i][j - 1]) {
+                            dpMatrix[i][j].stripeCol = dpMatrix[i][j - 1].stripeCol;
+                        }
                     }
 
                     // Обновляем макс. прямоугольник
@@ -84,21 +92,32 @@ namespace NMyDP {
                             // * продленная полоска stripeRow 
                             // * продленная полоска stripeCol
 
-                            int stripeRow = dpMatrix[i][j].stripeRow;
-                            int stripeCol = dpMatrix[i][j].stripeCol;
+                            // Продлеваем rectangle
                             int prevX = dpMatrix[i - 1][j - 1].rectangle.first;
                             int prevY = dpMatrix[i - 1][j - 1].rectangle.second;
+                            dpMatrix[i][j].rectangle = prolongRect(dpMatrix[i][j], prevX, prevY);
 
-                            dpMatrix[i][j].rectangle.first  = std::max(i + 1 - stripeRow, prevX);
-                            dpMatrix[i][j].rectangle.second = std::max(j + 1 - stripeCol, prevY);
+                            // Проверяем продленные полосы
+                            std::pair<int, int> nextStripeRow = prolongRect(dpMatrix[i][j], dpMatrix[i][j - 1].stripeRow, j - 1);
+                            std::pair<int, int> nextStripeCol = prolongRect(dpMatrix[i][j], i - 1, dpMatrix[i - 1][j].stripeCol);
+                            std::pair<int, int> maxStripe;
+                            if (getRectArea(nextStripeRow, i, j) > getRectArea(nextStripeCol, i, j)) {
+                                maxStripe = nextStripeRow;
+                            } else {
+                                maxStripe = nextStripeCol;
+                            }
 
-                            // ...
+                            if (getRectArea(maxStripe, i, j) > getRectArea(dpMatrix[i][j].rectangle, i, j)) {
+                                dpMatrix[i][j].rectangle.first  = maxStripe.first;
+                                dpMatrix[i][j].rectangle.second = maxStripe.second;
+                            }
                         }
                     }
 
+                    // Берем макc 
                     dpMatrix[i][j].maxArea = std::max(
-                        (i - dpMatrix[i][j].rectangle.first + 1) * (j - dpMatrix[i][j].rectangle.second + 1),
-                        std::max(dpMatrix[i][j].stripeRow, dpMatrix[i][j].stripeCol)
+                        getRectArea(dpMatrix[i][j].rectangle, i, j),
+                        std::max(i - dpMatrix[i][j].stripeRow + 1, j - dpMatrix[i][j].stripeCol + 1)
                     );
                     
                     if (dpMatrix[i][j].maxArea > result) {
