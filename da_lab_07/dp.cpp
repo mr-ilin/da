@@ -7,7 +7,7 @@
 namespace NMyDP {
 
     TDPMatrix::TDPMatrix(size_t rows, size_t cols)
-        : matrix(rows, std::vector<bool>(cols)), 
+        : matrix(rows, std::vector<char>(cols)), 
         dpMatrix(rows, std::vector<dpCell>(cols))
     {}
 
@@ -18,7 +18,7 @@ namespace NMyDP {
             std::string row;
             is >> row;
             for (size_t j = 0; j < colsCount; ++j) {
-                rhs.matrix[i][j] = (row[j] == '0');
+                rhs.matrix[i][j] = row[j];
             }
         }
         return is;
@@ -46,84 +46,52 @@ namespace NMyDP {
         return result;
     }
 
-    std::pair<int, int> TDPMatrix::prolongRect(const dpCell& curr, const int x, const int y) const {
-        return std::make_pair(
-            std::max(curr.stripeRow, x),
-            std::max(curr.stripeCol, y)
-        );
-    }
-
-    int getRectArea(const std::pair<int, int> & rectangle, const int i, const int j) {
-        return (i - rectangle.first + 1) * (j - rectangle.second + 1);
-    }
-
     int TDPMatrix::fillDpMatrix() {
         int result = 0;
         size_t rows = matrix.size();
         size_t cols = matrix[0].size();
-        for (int i = 0; i < rows; ++i)  {
+        
+        for (int i = 0; i < rows; ++i) {
+            
+            // Заполняем значениями пред. ряда и обновляем высоту и левую границу для тек. ряда
+            size_t currLeftBound = 0;
             for (int j = 0; j < cols; ++j) {
-                if (!matrix[i][j]) {
-                    dpMatrix[i][j].stripeRow = -1;
-                    dpMatrix[i][j].stripeCol = -1;
-                    dpMatrix[i][j].rectangle = std::make_pair(-1, -1);
-                    dpMatrix[i][j].maxArea = 0;
+                if (i > 0) {
+                    dpMatrix[i][j] = dpMatrix[i - 1][j];
+                    dpMatrix[i][j].maxArea = -1;
                 } else {
-                    // Обновляем макс. полосы по x и y
-                    dpMatrix[i][j].stripeRow = i;
-                    if (i > 0) {
-                        if (matrix[i - 1][j]) {
-                            dpMatrix[i][j].stripeRow = dpMatrix[i - 1][j].stripeRow;
-                        }
-                    }
-                    dpMatrix[i][j].stripeCol = j;
-                    if (j > 0) {
-                        if (matrix[i][j - 1]) {
-                            dpMatrix[i][j].stripeCol = dpMatrix[i][j - 1].stripeCol;
-                        }
-                    }
-
-                    // Обновляем макс. прямоугольник
-                    dpMatrix[i][j].rectangle = std::make_pair(i, j);
-                    if (i > 0 && j > 0) {
-                        if (matrix[i - 1][j - 1]) {
-                            // Выбираем из 3-х прямоугольников:
-                            // * продленный rectangle
-                            // * продленная полоска stripeRow 
-                            // * продленная полоска stripeCol
-
-                            // Продлеваем rectangle
-                            int prevX = dpMatrix[i - 1][j - 1].rectangle.first;
-                            int prevY = dpMatrix[i - 1][j - 1].rectangle.second;
-                            dpMatrix[i][j].rectangle = prolongRect(dpMatrix[i][j], prevX, prevY);
-
-                            // Проверяем продленные полосы
-                            std::pair<int, int> nextStripeRow = prolongRect(dpMatrix[i][j], dpMatrix[i][j - 1].stripeRow, j - 1);
-                            std::pair<int, int> nextStripeCol = prolongRect(dpMatrix[i][j], i - 1, dpMatrix[i - 1][j].stripeCol);
-                            std::pair<int, int> maxStripe;
-                            if (getRectArea(nextStripeRow, i, j) > getRectArea(nextStripeCol, i, j)) {
-                                maxStripe = nextStripeRow;
-                            } else {
-                                maxStripe = nextStripeCol;
-                            }
-
-                            if (getRectArea(maxStripe, i, j) > getRectArea(dpMatrix[i][j].rectangle, i, j)) {
-                                dpMatrix[i][j].rectangle.first  = maxStripe.first;
-                                dpMatrix[i][j].rectangle.second = maxStripe.second;
-                            }
-                        }
-                    }
-
-                    // Берем макc 
-                    dpMatrix[i][j].maxArea = std::max(
-                        getRectArea(dpMatrix[i][j].rectangle, i, j),
-                        std::max(i - dpMatrix[i][j].stripeRow + 1, j - dpMatrix[i][j].stripeCol + 1)
-                    );
-                    
-                    if (dpMatrix[i][j].maxArea > result) {
-                        result = dpMatrix[i][j].maxArea;
-                    }
+                    dpMatrix[i][j].height = 0;
+                    dpMatrix[i][j].leftBound = 0;
+                    dpMatrix[i][j].rightBound = cols - 1;
+                    dpMatrix[i][j].maxArea = 0;
                 }
+
+                if (matrix[i][j] == '0') {
+                    ++dpMatrix[i][j].height;
+                    dpMatrix[i][j].leftBound = std::max(dpMatrix[i][j].leftBound, currLeftBound);
+                } else {
+                    dpMatrix[i][j].height = 0;
+                    dpMatrix[i][j].leftBound = 0;
+                    currLeftBound = j + 1;
+                }
+            }
+
+            // Обновляем правую границу
+            size_t currRightBound = cols - 1;
+            for (int j = cols - 1; j >= 0; --j) {
+                if (matrix[i][j] == '0') {
+                    dpMatrix[i][j].rightBound = std::min(dpMatrix[i][j].rightBound , currRightBound);
+                } else {
+                    dpMatrix[i][j].rightBound = cols - 1;
+                    currRightBound = j - 1;
+                }
+            }
+
+            // Считаем площади
+            for (int j = 0; j < cols; ++j) {
+                dpCell& curr = dpMatrix[i][j];
+                curr.maxArea = curr.height * (curr.rightBound - curr.leftBound + 1);
+                result = std::max(result, curr.maxArea);
             }
         }
 
@@ -138,10 +106,9 @@ namespace NMyDP {
 
         for (auto row : dpMatrix) {
             for (auto el : row) {
-                std::cout << std::setw(2) << el.stripeRow << " & ";
-                std::cout << std::setw(2) << el.stripeCol << " (";
-                std::cout << std::setw(2) << el.rectangle.first << ", ";
-                std::cout << std::setw(2) << el.rectangle.second << ") ";
+                std::cout << std::setw(2) << el.height << " (";
+                std::cout << std::setw(2) << el.leftBound << ", ";
+                std::cout << std::setw(2) << el.rightBound << ") ";
                 std::cout << std::setw(2) << el.maxArea << "\t";
             }
             std::cout << std::endl << std::endl;
