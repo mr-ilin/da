@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -pedantic -Wall -Wno-unused-variable -O3
+CXXFLAGS = -std=c++17 -pedantic -Wall -Wno-unused-variable
 LDFLAGS = 
 
 EXECUTABLE = solution
@@ -10,7 +10,7 @@ TEST       = unit_test
 EXE_SRC = main.cpp dp.cpp
 EXE_OBJ = $(EXE_SRC:.cpp=.o)
 
-BENCH_SRC = 
+BENCH_SRC = benchmark.cpp dp.cpp
 BENCH_OBJ = $(BENCH_SRC:.cpp=.o)
 
 TEST_SRC = unit_tests.cpp dp.cpp
