@@ -94,10 +94,10 @@ Temporary Items
 .history
 
 ### Report files ###
-report/src
-report/styles
-report/Makefile
-report/report.tex
+*/report/src
+*/eport/styles
+*/report/Makefile
+*/report/report.tex
 
 *.xcuserstate
 *.xcuserstate
