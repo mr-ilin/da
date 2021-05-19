@@ -46,6 +46,7 @@ _deps
 Extra/
 extra
 build/*
+cmake-build-debug
 .cmake
 solution
 solution.tar
@@ -92,9 +93,11 @@ Temporary Items
 # Ignore all local history of files
 .history
 
-# End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,macos,c++,cmake
-
-# Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
+### Report files ###
+report/src
+report/styles
+report/Makefile
+report/report.tex
 
 *.xcuserstate
 *.xcuserstate
