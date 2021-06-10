@@ -89,6 +89,9 @@ Temporary Items
 .vscode/*
 */.vscode/*
 
+### CLion ###
+**/.idea
+
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
 .history
